@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>MAG - Announcements</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #f3f4f6;
+    color: #111827;
+}
+
+header {
+    background: #111827;
+    color: white;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-size: 30px;
+    font-weight: bold;
+}
+
+.logo span {
+    color: #22c55e;
+}
+
+.back-btn {
+    background: #374151;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 8px;
+    text-decoration: none;
+}
+
+.container {
+    max-width: 900px;
+    margin: 30px auto;
+    padding: 20px;
+}
+
+h1 {
+    font-size: 32px;
+    margin-bottom: 10px;
+}
+
+.subtitle {
+    color: #6b7280;
+    margin-bottom: 25px;
+}
+
+.form-box {
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    margin-bottom: 30px;
+}
+
+.form-box h2 {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-top: 15px;
+    margin-bottom: 6px;
+    font-weight: bold;
+}
+
+input,
+textarea,
+select {
+    width: 100%;
+    padding: 13px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 16px;
+    background: white;
+}
+
+textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+.create-btn {
+    width: 100%;
+    margin-top: 20px;
+    padding: 14px;
+    background: #22c55e;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 17px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.create-btn:hover {
+    background: #16a34a;
+}
+
+.announcement {
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.07);
+}
+
+.announcement h3 {
+    font-size: 21px;
+    margin-bottom: 10px;
+}
+
+.message {
+    line-height: 1.6;
+    margin-bottom: 12px;
+    white-space: pre-wrap;
+}
+
+.info {
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.delete-btn {
+    margin-top: 15px;
+    background: #ef4444;
+    color: white;
+    border: none;
+    padding: 9px 14px;
+    border-radius: 7px;
+    cursor: pointer;
+}
+
+.empty {
+    text-align: center;
+    color: #6b7280;
+    padding: 30px;
+    background: white;
+    border-radius: 15px;
+}
+
+@media (max-width: 600px) {
+    .container {
+        margin: 15px auto;
+        padding: 15px;
+    }
+
+    h1 {
+        font-size: 28px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+
+    <div class="logo">
+        MA<span>G</span>
+    </div>
+
+    <a href="dashboard.html" class="back-btn">
+        ← Dashboard
+    </a>
+
+</header>
+
+<div class="container">
+
+    <h1>📢 Announcements</h1>
+
+    <p class="subtitle">
+        Create and manage tournament announcements.
+    </p>
+
+    <div class="form-box">
+
+        <h2>➕ Create Announcement</h2>
+
+        <label>Title</label>
+
+        <input
+            type="text"
+            id="title"
+            placeholder="Example: Match postponed"
+        >
+
+        <label>Announcement</label>
+
+        <textarea
+            id="message"
+            placeholder="Write your announcement here..."
+        ></textarea>
+
+        <label>Priority</label>
+
+        <select id="priority">
+
+            <option value="Normal">
+                Normal
+            </option>
+
+            <option value="Important">
+                Important
+            </option>
+
+            <option value="Urgent">
+                Urgent
+            </option>
+
+        </select>
+
+        <button
+            class="create-btn"
+            onclick="createAnnouncement()">
+
+            Publish Announcement
+
+        </button>
+
+    </div>
+
+    <h2>📋 Published Announcements</h2>
+
+    <br>
+
+    <div id="announcementList"></div>
+
+</div>
+
+<script>
+
+let announcements =
+    JSON.parse(
+        localStorage.getItem("magAnnouncements")
+    ) || [];
+
+
+function createAnnouncement() {
+
+    const title =
+        document.getElementById("title").value.trim();
+
+    const message =
+        document.getElementById("message").value.trim();
+
+    const priority =
+        document.getElementById("priority").value;
+
+
+    if (!title || !message) {
+
+        alert(
+            "Please enter the title and announcement."
+        );
+
+        return;
+    }
+
+
+    const announcement = {
+
+        id: Date.now(),
+
+        title: title,
+
+        message: message,
+
+        priority: priority,
+
+        date: new Date().toLocaleString()
+
+    };
+
+
+    announcements.unshift(announcement);
+
+
+    localStorage.setItem(
+        "magAnnouncements",
+        JSON.stringify(announcements)
+    );
+
+
+    document.getElementById("title").value = "";
+
+    document.getElementById("message").value = "";
+
+    document.getElementById("priority").value = "Normal";
+
+
+    displayAnnouncements();
+}
+
+
+function deleteAnnouncement(id) {
+
+    if (
+        !confirm(
+            "Delete this announcement?"
+        )
+    ) {
+
+        return;
+    }
+
+
+    announcements =
+        announcements.filter(
+            announcement =>
+                announcement.id !== id
+        );
+
+
+    localStorage.setItem(
+        "magAnnouncements",
+        JSON.stringify(announcements)
+    );
+
+
+    displayAnnouncements();
+}
+
+
+function displayAnnouncements() {
+
+    const list =
+        document.getElementById("announcementList");
+
+
+    if (announcements.length === 0) {
+
+        list.innerHTML =
+            '<div class="empty">No announcements published yet.</div>';
+
+        return;
+    }
+
+
+    list.innerHTML = "";
+
+
+    announcements.forEach(announcement => {
+
+        const card =
+            document.createElement("div");
+
+        card.className =
+            "announcement";
+
+
+        card.innerHTML = `
+
+            <h3>
+                📢 ${announcement.title}
+            </h3>
+
+            <div class="message">
+                ${announcement.message}
+            </div>
+
+            <div class="info">
+
+                Priority:
+                ${announcement.priority}
+
+                <br>
+
+                Published:
+                ${announcement.date}
+
+            </div>
+
+            <button
+                class="delete-btn"
+                onclick="deleteAnnouncement(${announcement.id})">
+
+                Delete
+
+            </button>
+
+        `;
+
+
+        list.appendChild(card);
+
+    });
+}
+
+
+displayAnnouncements();
+
+</script>
+
+</body>
+  </html>
