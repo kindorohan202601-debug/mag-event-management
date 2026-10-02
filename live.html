@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>MAG - Live Match</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #f3f4f6;
+    color: #111827;
+}
+
+header {
+    background: #111827;
+    color: white;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-size: 30px;
+    font-weight: bold;
+}
+
+.logo span {
+    color: #22c55e;
+}
+
+.back-btn {
+    background: #374151;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 8px;
+    text-decoration: none;
+}
+
+.container {
+    max-width: 900px;
+    margin: 30px auto;
+    padding: 20px;
+}
+
+h1 {
+    font-size: 32px;
+    margin-bottom: 10px;
+}
+
+.subtitle {
+    color: #6b7280;
+    margin-bottom: 25px;
+}
+
+.box {
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    margin-bottom: 25px;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+select {
+    width: 100%;
+    padding: 13px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 16px;
+    margin-bottom: 15px;
+}
+
+button {
+    border: none;
+    border-radius: 8px;
+    padding: 12px 18px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.start-btn {
+    background: #22c55e;
+    color: white;
+    width: 100%;
+}
+
+.scoreboard {
+    text-align: center;
+    background: #111827;
+    color: white;
+    padding: 30px 20px;
+    border-radius: 15px;
+}
+
+.match-title {
+    color: #9ca3af;
+    margin-bottom: 20px;
+}
+
+.teams {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 25px;
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.score {
+    font-size: 50px;
+    margin: 20px 0;
+    font-weight: bold;
+}
+
+.vs {
+    color: #22c55e;
+}
+
+.controls {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.score-btn {
+    background: #22c55e;
+    color: white;
+}
+
+.minus-btn {
+    background: #ef4444;
+    color: white;
+}
+
+.pause-btn {
+    background: #f59e0b;
+    color: white;
+}
+
+.finish-btn {
+    background: #6b7280;
+    color: white;
+}
+
+.status {
+    margin-top: 20px;
+    font-weight: bold;
+    color: #22c55e;
+}
+
+.empty {
+    text-align: center;
+    color: #6b7280;
+    padding: 25px;
+}
+
+@media(max-width:600px) {
+
+    .container {
+        padding: 15px;
+    }
+
+    .teams {
+        font-size: 17px;
+        gap: 10px;
+    }
+
+    .score {
+        font-size: 42px;
+    }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header>
+
+    <div class="logo">
+        MA<span>G</span>
+    </div>
+
+    <a href="dashboard.html" class="back-btn">
+        ← Dashboard
+    </a>
+
+</header>
+
+
+<div class="container">
+
+<h1>🔴 Live Match</h1>
+
+<p class="subtitle">
+Manage live scores and match updates.
+</p>
+
+
+<div class="box">
+
+<h2>🎯 Select Fixture</h2>
+
+<br>
+
+<label>Select Match</label>
+
+<select id="fixture">
+
+<option value="">
+Select a fixture
+</option>
+
+</select>
+
+<button
+class="start-btn"
+onclick="startMatch()">
+
+Start Live Match
+
+</button>
+
+</div>
+
+
+<div id="liveArea"></div>
+
+</div>
+
+
+<script>
+
+let fixtures =
+JSON.parse(
+localStorage.getItem("magFixtures")
+) || [];
+
+
+let liveMatch = null;
+
+
+function loadFixtures() {
+
+const select =
+document.getElementById("fixture");
+
+select.innerHTML =
+'<option value="">Select a fixture</option>';
+
+
+fixtures.forEach(fixture => {
+
+const option =
+document.createElement("option");
+
+option.value =
+fixture.id;
+
+option.textContent =
+fixture.teamA +
+" vs " +
+fixture.teamB +
+" - " +
+fixture.date +
+" " +
+fixture.time;
+
+select.appendChild(option);
+
+});
+
+}
+
+
+function startMatch() {
+
+const id =
+document.getElementById("fixture").value;
+
+
+if (!id) {
+
+alert("Please select a fixture.");
+
+return;
+
+}
+
+
+const fixture =
+fixtures.find(
+item => String(item.id) === String(id)
+);
+
+
+if (!fixture) {
+
+alert("Fixture not found.");
+
+return;
+
+}
+
+
+liveMatch = {
+
+id: fixture.id,
+
+tournamentName:
+fixture.tournamentName,
+
+teamA:
+fixture.teamA,
+
+teamB:
+fixture.teamB,
+
+scoreA: 0,
+
+scoreB: 0,
+
+status: "LIVE"
+
+};
+
+
+displayLiveMatch();
+
+}
+
+
+function addScore(team) {
+
+if (!liveMatch) {
+return;
+}
+
+
+if (team === "A") {
+
+liveMatch.scoreA++;
+
+}
+
+if (team === "B") {
+
+liveMatch.scoreB++;
+
+}
+
+
+displayLiveMatch();
+
+}
+
+
+function removeScore(team) {
+
+if (!liveMatch) {
+return;
+}
+
+
+if (team === "A" && liveMatch.scoreA > 0) {
+
+liveMatch.scoreA--;
+
+}
+
+if (team === "B" && liveMatch.scoreB > 0) {
+
+liveMatch.scoreB--;
+
+}
+
+
+displayLiveMatch();
+
+}
+
+
+function pauseMatch() {
+
+if (!liveMatch) {
+return;
+}
+
+liveMatch.status = "PAUSED";
+
+displayLiveMatch();
+
+}
+
+
+function finishMatch() {
+
+if (!liveMatch) {
+return;
+}
+
+liveMatch.status = "FINISHED";
+
+displayLiveMatch();
+
+}
+
+
+function displayLiveMatch() {
+
+const area =
+document.getElementById("liveArea");
+
+
+if (!liveMatch) {
+
+area.innerHTML = "";
+
+return;
+
+}
+
+
+area.innerHTML = `
+
+<div class="scoreboard">
+
+<div class="match-title">
+
+🏆 ${liveMatch.tournamentName}
+
+</div>
+
+
+<div class="teams">
+
+<span>
+${liveMatch.teamA}
+</span>
+
+<span class="vs">
+VS
+</span>
+
+<span>
+${liveMatch.teamB}
+</span>
+
+</div>
+
+
+<div class="score">
+
+${liveMatch.scoreA}
+-
+${liveMatch.scoreB}
+
+</div>
+
+
+<div class="controls">
+
+<button
+class="score-btn"
+onclick="addScore('A')">
+
++ ${liveMatch.teamA}
+
+</button>
+
+
+<button
+class="minus-btn"
+onclick="removeScore('A')">
+
+− ${liveMatch.teamA}
+
+</button>
+
+
+<button
+class="score-btn"
+onclick="addScore('B')">
+
++ ${liveMatch.teamB}
+
+</button>
+
+
+<button
+class="minus-btn"
+onclick="removeScore('B')">
+
+− ${liveMatch.teamB}
+
+</button>
+
+</div>
+
+
+<br>
+
+
+<div class="controls">
+
+<button
+class="pause-btn"
+onclick="pauseMatch()">
+
+⏸ Pause
+
+</button>
+
+
+<button
+class="finish-btn"
+onclick="finishMatch()">
+
+🏁 Finish
+
+</button>
+
+</div>
+
+
+<div class="status">
+
+Status: ${liveMatch.status}
+
+</div>
+
+</div>
+
+`;
+
+}
+
+
+loadFixtures();
+
+</script>
+
+</body>
+
+  </html>
