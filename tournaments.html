@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>MAG - Tournaments</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #f3f4f6;
+    color: #111827;
+}
+
+header {
+    background: #111827;
+    color: white;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-size: 30px;
+    font-weight: bold;
+}
+
+.logo span {
+    color: #22c55e;
+}
+
+.back-btn {
+    background: #374151;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 8px;
+    text-decoration: none;
+}
+
+.container {
+    max-width: 900px;
+    margin: 30px auto;
+    padding: 20px;
+}
+
+h1 {
+    font-size: 32px;
+    margin-bottom: 10px;
+}
+
+.subtitle {
+    color: #6b7280;
+    margin-bottom: 25px;
+}
+
+.form-box {
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    margin-bottom: 30px;
+}
+
+.form-box h2 {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-top: 15px;
+    margin-bottom: 6px;
+    font-weight: bold;
+}
+
+input, select {
+    width: 100%;
+    padding: 13px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 16px;
+}
+
+.create-btn {
+    width: 100%;
+    margin-top: 20px;
+    padding: 14px;
+    background: #22c55e;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 17px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.create-btn:hover {
+    background: #16a34a;
+}
+
+.tournament {
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.07);
+}
+
+.tournament h3 {
+    font-size: 22px;
+    margin-bottom: 10px;
+}
+
+.info {
+    color: #6b7280;
+    line-height: 1.8;
+}
+
+.delete-btn {
+    margin-top: 15px;
+    background: #ef4444;
+    color: white;
+    border: none;
+    padding: 9px 14px;
+    border-radius: 7px;
+    cursor: pointer;
+}
+
+.empty {
+    text-align: center;
+    color: #6b7280;
+    padding: 30px;
+}
+
+@media (max-width: 600px) {
+    .container {
+        margin: 15px auto;
+        padding: 15px;
+    }
+
+    h1 {
+        font-size: 28px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">MA<span>G</span></div>
+    <a href="dashboard.html" class="back-btn">← Dashboard</a>
+</header>
+
+<div class="container">
+
+    <h1>🏆 Tournament Management</h1>
+    <p class="subtitle">
+        Create and manage multiple sports tournaments.
+    </p>
+
+    <div class="form-box">
+
+        <h2>➕ Create Tournament</h2>
+
+        <label>Tournament Name</label>
+        <input
+            type="text"
+            id="name"
+            placeholder="Example: Dooars Football Cup"
+        >
+
+        <label>Sport</label>
+        <select id="sport">
+            <option value="">Select Sport</option>
+            <option>Football</option>
+            <option>Cricket</option>
+            <option>Volleyball</option>
+            <option>Basketball</option>
+            <option>Other</option>
+        </select>
+
+        <label>Start Date</label>
+        <input type="date" id="date">
+
+        <label>Venue</label>
+        <input
+            type="text"
+            id="venue"
+            placeholder="Example: Bundapani Ground"
+        >
+
+        <button class="create-btn" onclick="createTournament()">
+            Create Tournament
+        </button>
+
+    </div>
+
+    <h2>📋 Your Tournaments</h2>
+
+    <br>
+
+    <div id="tournamentList"></div>
+
+</div>
+
+<script>
+
+let tournaments =
+    JSON.parse(localStorage.getItem("magTournaments")) || [];
+
+function createTournament() {
+
+    const name = document.getElementById("name").value.trim();
+    const sport = document.getElementById("sport").value;
+    const date = document.getElementById("date").value;
+    const venue = document.getElementById("venue").value.trim();
+
+    if (!name || !sport || !date || !venue) {
+        alert("Please fill in all tournament details.");
+        return;
+    }
+
+    const tournament = {
+        id: Date.now(),
+        name: name,
+        sport: sport,
+        date: date,
+        venue: venue
+    };
+
+    tournaments.push(tournament);
+
+    localStorage.setItem(
+        "magTournaments",
+        JSON.stringify(tournaments)
+    );
+
+    document.getElementById("name").value = "";
+    document.getElementById("sport").value = "";
+    document.getElementById("date").value = "";
+    document.getElementById("venue").value = "";
+
+    displayTournaments();
+}
+
+function deleteTournament(id) {
+
+    if (!confirm("Delete this tournament?")) {
+        return;
+    }
+
+    tournaments = tournaments.filter(
+        tournament => tournament.id !== id
+    );
+
+    localStorage.setItem(
+        "magTournaments",
+        JSON.stringify(tournaments)
+    );
+
+    displayTournaments();
+}
+
+function displayTournaments() {
+
+    const list = document.getElementById("tournamentList");
+
+    if (tournaments.length === 0) {
+
+        list.innerHTML =
+            '<div class="empty">No tournaments created yet.</div>';
+
+        return;
+    }
+
+    list.innerHTML = "";
+
+    tournaments.forEach(tournament => {
+
+        const card = document.createElement("div");
+
+        card.className = "tournament";
+
+        card.innerHTML = `
+            <h3>🏆 ${tournament.name}</h3>
+
+            <div class="info">
+                ⚽ Sport: ${tournament.sport}<br>
+                📅 Date: ${tournament.date}<br>
+                📍 Venue: ${tournament.venue}
+            </div>
+
+            <button
+                class="delete-btn"
+                onclick="deleteTournament(${tournament.id})">
+                Delete
+            </button>
+        `;
+
+        list.appendChild(card);
+    });
+}
+
+displayTournaments();
+
+</script>
+
+</body>
+</html>
