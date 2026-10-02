@@ -600,7 +600,15 @@ class="box hidden">
 <h3>🪙 Toss</h3>
 
 <label>Toss Winner</label>
+<label>Match Overs</label>
 
+<input
+    type="number"
+    id="totalOvers"
+    min="1"
+    step="1"
+    placeholder="Enter total overs"
+>
 <select id="tossWinner">
 
 <option value="A">Team A</option>
@@ -616,7 +624,15 @@ class="box hidden">
 <option value="bowl">Bowl First</option>
 
 </select>
+<label>Match Overs</label>
 
+<input
+    type="number"
+    id="totalOvers"
+    min="1"
+    step="1"
+    placeholder="Enter total overs"
+>
 <button
 class="primary full"
 onclick="applyToss()">
@@ -1130,7 +1146,10 @@ function applyToss() {
     if (!liveMatch) {
         return;
     }
+const totalOvers =
+    Number(document.getElementById("totalOvers").value) || 1;
 
+liveMatch.totalOvers = totalOvers;
     const winner =
         document.getElementById("tossWinner").value;
 
@@ -1176,8 +1195,7 @@ function applyToss() {
 
     document.getElementById("cricketDisplay")
         .textContent =
-        battingTeam + " — 0/0 (0.0/20)";
-                            }
+          battingTeam + " — 0/0 (0.0/" + liveMatch.totalOvers + ")";
 
 /* =========================
    FOOTBALL SCORE
