@@ -595,11 +595,42 @@ class="box hidden">
 
 <div class="cricket-grid">
 
+ <div class="stat">
+
+<h3>🪙 Toss</h3>
+
+<label>Toss Winner</label>
+
+<select id="tossWinner">
+
+<option value="A">Team A</option>
+<option value="B">Team B</option>
+
+</select>
+
+<label>Toss Decision</label>
+
+<select id="tossDecision">
+
+<option value="bat">Bat First</option>
+<option value="bowl">Bowl First</option>
+
+</select>
+
+<button
+class="primary full"
+onclick="applyToss()">
+
+🏏 Apply Toss
+
+</button>
+
+</div>
+
+
 <div class="stat">
 
-<h3>
-🏏 Batting Team
-</h3>
+<h3>🏏 Batting Team</h3>
 
 <p id="battingTeam">
 Team A
@@ -610,9 +641,7 @@ Team A
 
 <div class="stat">
 
-<h3>
-🎯 Bowling Team
-</h3>
+<h3>🎯 Bowling Team</h3>
 
 <p id="bowlingTeam">
 Team B
@@ -1074,13 +1103,15 @@ document
 .getElementById("cricketScore")
 .classList.remove("hidden");
 
-document.getElementById("battingTeam")
+ document
+.getElementById("battingTeam")
 .textContent =
-liveMatch.teamA;
+liveMatch.battingTeam || liveMatch.teamA;
 
-document.getElementById("bowlingTeam")
+document
+.getElementById("bowlingTeam")
 .textContent =
-liveMatch.teamB;
+liveMatch.bowlingTeam || liveMatch.teamB;
 
 }
 
@@ -1094,7 +1125,59 @@ document
 }
 
 }
+function applyToss() {
 
+    if (!liveMatch) {
+        return;
+    }
+
+    const winner =
+        document.getElementById("tossWinner").value;
+
+    const decision =
+        document.getElementById("tossDecision").value;
+
+    let battingTeam;
+    let bowlingTeam;
+
+    if (decision === "bat") {
+
+        battingTeam =
+            winner === "A"
+            ? liveMatch.teamA
+            : liveMatch.teamB;
+
+        bowlingTeam =
+            winner === "A"
+            ? liveMatch.teamB
+            : liveMatch.teamA;
+
+    } else {
+
+        bowlingTeam =
+            winner === "A"
+            ? liveMatch.teamA
+            : liveMatch.teamB;
+
+        battingTeam =
+            winner === "A"
+            ? liveMatch.teamB
+            : liveMatch.teamA;
+    }
+
+    liveMatch.battingTeam = battingTeam;
+    liveMatch.bowlingTeam = bowlingTeam;
+
+    document.getElementById("battingTeam")
+        .textContent = battingTeam;
+
+    document.getElementById("bowlingTeam")
+        .textContent = bowlingTeam;
+
+    document.getElementById("cricketDisplay")
+        .textContent =
+        battingTeam + " — 0/0 (0.0/20)";
+                            }
 
 /* =========================
    FOOTBALL SCORE
