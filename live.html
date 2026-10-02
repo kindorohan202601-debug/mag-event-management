@@ -1441,55 +1441,68 @@ document.getElementById("playerOut")
    CRICKET SCORE
 ========================= */
 
-function updateCricket() {
+ function updateCricket() {
 
-if (!liveMatch) {
-return;
-}
+    if (!liveMatch) {
+        return;
+    }
 
+    const runs =
+        Number(
+            document.getElementById("cricketRuns").value
+        ) || 0;
 
-const runs =
-Number(
-document.getElementById("cricketRuns").value
-) || 0;
+    const wickets =
+        Number(
+            document.getElementById("cricketWickets").value
+        ) || 0;
 
+    const over =
+        document.getElementById("currentOver").value
+        || "0.0";
 
-const wickets =
-Number(
-document.getElementById("cricketWickets").value
-) || 0;
+    const totalOvers =
+        document.getElementById("totalOvers")
+        ? document.getElementById("totalOvers").value || "20"
+        : "20";
 
+    const battingTeam =
+        document.getElementById("battingTeamInput")
+        ? document.getElementById("battingTeamInput").value.trim()
+        : liveMatch.teamA;
 
-const over =
-document.getElementById("currentOver").value
-|| "0.0";
+    liveMatch.cricket = {
 
+        battingTeam: battingTeam || liveMatch.teamA,
 
-liveMatch.scoreA = runs;
+        runs: runs,
 
-liveMatch.scoreB = wickets;
+        wickets: wickets,
 
+        overs: over,
 
-const display =
+        totalOvers: totalOvers
 
-liveMatch.teamA +
-" — " +
-runs +
-"/" +
-wickets +
-" (" +
-over +
-"/20)";
+    };
 
+    const display =
+        (battingTeam || liveMatch.teamA) +
+        " — " +
+        runs +
+        "/" +
+        wickets +
+        " (" +
+        over +
+        "/" +
+        totalOvers +
+        ")";
 
-document.getElementById("cricketScore")
-.textContent = display;
+    document.getElementById("cricketScore")
+        .textContent = display;
 
-
-document.getElementById("cricketDisplay")
-.textContent = display;
-
-}
+    document.getElementById("cricketDisplay")
+        .textContent = display;
+    }
 
 
 /* =========================
